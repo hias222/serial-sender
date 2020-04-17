@@ -1,5 +1,5 @@
 if (WIN32)
-    set (OTHER_SRC sendin.cpp )
+    set (OTHER_SRC sendwin.cpp )
 else ()
     set (OTHER_SRC send.cpp)
 endif (WIN32)
