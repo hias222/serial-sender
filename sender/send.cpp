@@ -14,8 +14,8 @@
 
 #include <unistd.h>
 
-#define  MODEMDEVICE "/dev/ttyUSB0"
-//#define MODEMDEVICE "/dev/ttys005"
+//#define  MODEMDEVICE "/dev/ttyUSB0"
+#define MODEMDEVICE "/dev/ttys004"
 //#define MODEMDEVICE "/dev/serial0"
 #define _POSIX_SOURCE 1 /* POSIX compliant source */
 #define FALSE 0
