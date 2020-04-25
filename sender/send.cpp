@@ -25,10 +25,13 @@ volatile int STOP = FALSE;
 
 int send()
 {
+    char filename[] = "test.txt";
     int fd, c, res;
     struct termios oldtio, newtio;
+    FILE *fp;
+    char buff[255];
 
-    printf ("using %s \n", MODEMDEVICE);
+    printf("using %s \n", MODEMDEVICE);
 
     fd = open(MODEMDEVICE, O_RDWR | O_NOCTTY);
     if (fd < 0)
@@ -61,13 +64,62 @@ int send()
     printf("ready\n");
     fflush(stdout);
 
-    //unsigned char text = "hello";
-    char message[] = "\xbe\x70\x6f\x5f\x40\x30\x20\xa1\x0d\x1f\x2f\x3f\x4d\x5d\x6f\x7f\xbc\x0e\x1e\x20\x30\x4d\x5d\x6a\x7e\xbd\x0d\x1f\x2f\x3f\x4d\x5d\x6f\x7f\xba\x0d\x1a\x20\x30\x4c\x59\x66\x77\xbb\x0d\x1f\x2f\x3f\x4d\x5d\x6f\x7f\xb8\x0c\x19\x20\x30\x4b\x5f\x6e\x79\xb9\x0d\x1f\x2f\x3f\x4d\x5d\x6f\x7f\xb6\x0b\x18\x20\x30\x4b\x5c\x6d\x77\xb7\x0d\x1f\x2f\x3f\x4d\x5d\x6f\x7f\xbe\x70\x6f\x5f\x40\x30\x20\xb4\x0a\x17\x20\x30\x4a\x5d\x6f\x78\xb5\x0d\x1f\x2f\x3f\x4d\x5d\x6f\x7f\xb2\x09\x1d\x20\x30\x4d\x58\x68\x7b\xb3\x0d\x1f\x2f\x3f\x4d\x5d\x6f\x7f\xb0\x08\x1c\x20\x30\x4c\x5f\x6c\x79\xb1\x0d\x1f\x2f\x3f\x4d\x5d\x6f\x7f\xae\x07\x1b\x20\x30\x4c\x5c\x6b\x7d\xaf\x0d\x1f\x2f\x3f\x4d\x5d\x6f\x7f\x7f";
-    char buf[] = "\x80";
+    printf("opening file %s\n", filename);
 
-    res = write(fd, buf, strlen(buf)); 
-    res = write(fd, message, strlen(message)); 
-    res = write(fd, buf, strlen(buf)); 
+    if (!(fp = fopen(filename, "r")))
+    {
+        printf("error opening file\n");
+        return 1;
+    }
+
+    int i,h = 0;
+
+    bool isfirst = true;
+
+    char hexa[2];
+    static char hex_tmp[255];
+
+    while (fgets(buff, 255, (FILE *)fp) != NULL)
+    {
+        i++;
+        h = 0;
+        printf("line %d\n", i);
+        //printf("1 : %s\n", buff);
+        for (int g = 0; g < strlen(buff); g++)
+        {
+            if (isfirst)
+            {
+                isfirst = false;
+                hexa[0] = buff[g];
+            }
+            else
+            {
+                isfirst = true;
+                hexa[1] = buff[g];
+                //printf("%s ", hexa);
+                int num = (int)strtol(hexa, NULL, 16); // number base 16       
+                printf("%02x ", num);
+                hex_tmp[h] = num;
+                h++;
+                //sprintf(hex_tmp, "%02x", num);
+                //printf("%c:", hex_tmp[h]);
+            }
+
+            //printf("%c: %02x ", buff[g], buff[g]);
+        }
+        res = write(fd, hex_tmp, strlen(hex_tmp));
+    }
+
+    fclose(fp);
+
+    //unsigned char text = "hello";
+    printf("\n\n");
+    //char message[] = "\xbe\x70\x6f\x5f\x40\x30\x20\xa1\x0d\x1f\x2f\x3f\x4d\x5d\x6f\x7f\xbc\x0e\x1e\x20\x30\x4d\x5d\x6a\x7e\xbd\x0d\x1f\x2f\x3f\x4d\x5d\x6f\x7f\xba\x0d\x1a\x20\x30\x4c\x59\x66\x77\xbb\x0d\x1f\x2f\x3f\x4d\x5d\x6f\x7f\xb8\x0c\x19\x20\x30\x4b\x5f\x6e\x79\xb9\x0d\x1f\x2f\x3f\x4d\x5d\x6f\x7f\xb6\x0b\x18\x20\x30\x4b\x5c\x6d\x77\xb7\x0d\x1f\x2f\x3f\x4d\x5d\x6f\x7f\xbe\x70\x6f\x5f\x40\x30\x20\xb4\x0a\x17\x20\x30\x4a\x5d\x6f\x78\xb5\x0d\x1f\x2f\x3f\x4d\x5d\x6f\x7f\xb2\x09\x1d\x20\x30\x4d\x58\x68\x7b\xb3\x0d\x1f\x2f\x3f\x4d\x5d\x6f\x7f\xb0\x08\x1c\x20\x30\x4c\x5f\x6c\x79\xb1\x0d\x1f\x2f\x3f\x4d\x5d\x6f\x7f\xae\x07\x1b\x20\x30\x4c\x5c\x6b\x7d\xaf\x0d\x1f\x2f\x3f\x4d\x5d\x6f\x7f\x7f";
+    //char buf[] = "\x80";
+
+    //res = write(fd, buff, strlen(buf));
+    //res = write(fd, message, strlen(message));
+    //res = write(fd, buf, strlen(buf));
 
     printf("write %d\n", res);
 
