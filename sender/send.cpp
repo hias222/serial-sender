@@ -15,7 +15,7 @@
 #include <unistd.h>
 
 //#define  MODEMDEVICE "/dev/ttyUSB0"
-#define MODEMDEVICE "/dev/ttys004"
+//#define MODEMDEVICE "/dev/ttys006"
 //#define MODEMDEVICE "/dev/serial0"
 #define _POSIX_SOURCE 1 /* POSIX compliant source */
 #define FALSE 0
@@ -23,7 +23,7 @@
 
 volatile int STOP = FALSE;
 
-int send()
+int send(char *portname)
 {
     char filename[] = "test.txt";
     int fd, c, res;
@@ -31,12 +31,12 @@ int send()
     FILE *fp;
     char buff[255];
 
-    printf("using %s \n", MODEMDEVICE);
+    printf("using %s \n", portname);
 
-    fd = open(MODEMDEVICE, O_RDWR | O_NOCTTY);
+    fd = open(portname, O_RDWR | O_NOCTTY);
     if (fd < 0)
     {
-        perror(MODEMDEVICE);
+        perror(portname);
         return 1;
     }
 
@@ -99,7 +99,14 @@ int send()
                 //printf("%s ", hexa);
                 int num = (int)strtol(hexa, NULL, 16); // number base 16       
                 printf("%02x ", num);
+                if (num == 0x00){
+                   // num = 0x40;
+                   printf (".");
+                }
                 hex_tmp[h] = num;
+                unsigned char mychar = num;
+                // out.write((char *) &n, sizeof n); 
+                res = write(fd, &mychar, sizeof mychar);
                 h++;
                 //sprintf(hex_tmp, "%02x", num);
                 //printf("%c:", hex_tmp[h]);
@@ -107,7 +114,7 @@ int send()
 
             //printf("%c: %02x ", buff[g], buff[g]);
         }
-        res = write(fd, hex_tmp, strlen(hex_tmp));
+        //res = write(fd, hex_tmp, strlen(hex_tmp));
     }
 
     fclose(fp);
