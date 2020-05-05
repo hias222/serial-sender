@@ -9,6 +9,10 @@
 #include <string.h>
 #include <string>
 
+#ifndef WIN32
+#include <time.h>
+#endif
+
 // Linux headers
 #include <errno.h> // Error integer and strerror() function
 
@@ -30,6 +34,10 @@ int send(char *portname)
     struct termios oldtio, newtio;
     FILE *fp;
     char buff[255];
+
+    struct timespec ts;
+    ts.tv_sec = 0;
+    ts.tv_nsec = 100000000;
 
     printf("using %s \n", portname);
 
@@ -72,19 +80,17 @@ int send(char *portname)
         return 1;
     }
 
-    int i,h = 0;
-
+    int i = 0;
     bool isfirst = true;
 
     char hexa[2];
-    static char hex_tmp[255];
 
     while (fgets(buff, 255, (FILE *)fp) != NULL)
     {
         i++;
-        h = 0;
+
         printf("line %d\n", i);
-        //printf("1 : %s\n", buff);
+
         for (int g = 0; g < strlen(buff); g++)
         {
             if (isfirst)
@@ -96,25 +102,22 @@ int send(char *portname)
             {
                 isfirst = true;
                 hexa[1] = buff[g];
-                //printf("%s ", hexa);
-                int num = (int)strtol(hexa, NULL, 16); // number base 16       
+                int num = (int)strtol(hexa, NULL, 16); // number base 16
                 printf("%02x ", num);
-                if (num == 0x00){
-                   // num = 0x40;
-                   printf (".");
+                if (num == 0x00)
+                {
+                    printf(".");
                 }
-                hex_tmp[h] = num;
                 unsigned char mychar = num;
-                // out.write((char *) &n, sizeof n); 
                 res = write(fd, &mychar, sizeof mychar);
-                h++;
-                //sprintf(hex_tmp, "%02x", num);
-                //printf("%c:", hex_tmp[h]);
             }
-
-            //printf("%c: %02x ", buff[g], buff[g]);
         }
-        //res = write(fd, hex_tmp, strlen(hex_tmp));
+// wait some time
+#ifdef WIN32
+        Sleep(100);
+#else
+        nanosleep(&ts, NULL);
+#endif
     }
 
     fclose(fp);
