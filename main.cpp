@@ -6,7 +6,7 @@
 #include "send.h"
 #endif
 
-#define BASIC_PORTNAME "/dev/ttys006"
+#define BASIC_PORTNAME "/dev/ttys004"
 
 void usage(char *prog)
 {
