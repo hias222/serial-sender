@@ -9,6 +9,8 @@
 #include <string.h>
 #include <string>
 
+// #define debug
+
 #ifndef WIN32
 #include <time.h>
 #endif
@@ -90,7 +92,9 @@ int send(char *portname)
     {
         i++;
 
+#ifdef debug
         printf("line %d\n", i);
+#endif
 
         for (int g = 0; g < strlen(buff); g++)
         {
@@ -104,11 +108,14 @@ int send(char *portname)
                 isfirst = true;
                 hexa[1] = buff[g];
                 int num = (int)strtol(hexa, NULL, 16); // number base 16
+#ifdef debug
                 printf("%02x ", num);
+
                 if (num == 0x00)
                 {
                     printf(".");
                 }
+#endif
                 unsigned char mychar = num;
                 res = write(fd, &mychar, sizeof mychar);
             }
