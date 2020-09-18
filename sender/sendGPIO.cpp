@@ -32,6 +32,7 @@ int send(char *portname)
     FILE *fp;
     char *TEXT;
     char text[2048];
+    char buff[255];
 
     char filename[] = "test.txt";
 
@@ -86,7 +87,7 @@ int send(char *portname)
 
                 unsigned char mychar = num;
                 //int serWrite(unsigned handle, char *buf, unsigned count)
-                serWriteByte(USBHandle, &mychar, b)
+                serWriteByte(USBHandle, &mychar, 2)
                 //res = write(fd, &mychar, sizeof mychar);
             }
         }
