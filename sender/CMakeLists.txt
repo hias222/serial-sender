@@ -46,7 +46,7 @@ endif(RASPBERRYPI)
 
 if(RASPBERRYPI)
     message(STATUS "serial-sender link pigpio")
-    target_link_libraries( sender pigpio)
+    target_link_libraries( serial-sender pigpio)
 endif(RASPBERRYPI)
 
 add_library(sender
