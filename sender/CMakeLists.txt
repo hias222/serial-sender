@@ -3,7 +3,7 @@ if (WIN32)
 else (WIN32)
     if (RASPBERRYPI)
         message(STATUS "serial-sender RASPBERRY")
-        set (OTHER_SRC sendGPIO.cpp)
+        
     else(RASPBERRYPI)
         message(STATUS "serial-sender no RASPBERRY")
         set (OTHER_SRC send.cpp)
@@ -41,14 +41,13 @@ if(RASPBERRYPI)
         DEFAULT_MSG 
         pigpio_INCLUDE_DIR pigpio_LIBRARY pigpiod_if_LIBRARY pigpiod_if2_LIBRARY)
 
-
-    set (OTHER_SRC readGPIO.cpp )
+    set (OTHER_SRC sendGPIO.cpp)
 endif(RASPBERRYPI)
 
-if(RASPBERRYPI)
-    message(STATUS "serial-sender link pigpio")
-    target_link_libraries( pigpio)
-endif(RASPBERRYPI)
+#if(RASPBERRYPI)
+#    message(STATUS "serial-sender link pigpio")
+#    target_link_libraries( pigpio)
+#endif(RASPBERRYPI)
 
 add_library(sender
                 ${OTHER_SRC}
