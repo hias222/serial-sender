@@ -11,6 +11,7 @@ else (WIN32)
 endif (WIN32)
 
 if(RASPBERRYPI)
+    message(STATUS "serial-sender add gpio libs")
     # Find the path to the pigpio includes.
     find_path(pigpio_INCLUDE_DIR 
         NAMES pigpio.h pigpiod_if.h pigpiod_if2.h
@@ -45,6 +46,7 @@ if(RASPBERRYPI)
 endif(RASPBERRYPI)
 
 if(RASPBERRYPI)
+    message(STATUS "serial-sender link pigpio")
     target_link_libraries( pigpio)
 endif(RASPBERRYPI)
 
