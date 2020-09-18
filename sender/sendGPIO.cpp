@@ -29,6 +29,7 @@ int send(char *portname)
     int USBHandle, e;
     uint b;
     int order;
+    FILE *fp;
     char *TEXT;
     char text[2048];
 
