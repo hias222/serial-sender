@@ -44,14 +44,14 @@ if(RASPBERRYPI)
     set (OTHER_SRC sendGPIO.cpp)
 endif(RASPBERRYPI)
 
-if(RASPBERRYPI)
-    message(STATUS "serial-sender link pigpio")
-    target_link_libraries( serial-sender pigpio)
-endif(RASPBERRYPI)
-
 add_library(sender
                 ${OTHER_SRC}
             )
+
+if(RASPBERRYPI)
+    message(STATUS "serial-sender link pigpio")
+    target_link_libraries(sender pigpio)
+endif(RASPBERRYPI)
 
 target_include_directories(sender PUBLIC
       "${PROJECT_BINARY_DIR}"
