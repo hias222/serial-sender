@@ -87,7 +87,7 @@ int send(char *portname)
 
                 unsigned char mychar = num;
                 //int serWrite(unsigned handle, char *buf, unsigned count)
-                serWrite(USBHandle, &mychar, sizeof mychar)
+                serWrite(USBHandle, &mychar, sizeof mychar);
                 //res = write(fd, &mychar, sizeof mychar);
             }
         }
