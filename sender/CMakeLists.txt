@@ -45,7 +45,7 @@ if(RASPBERRYPI)
 endif(RASPBERRYPI)
 
 if(RASPBERRYPI)
-    target_link_libraries(receiver  pigpio)
+    target_link_libraries( pigpio)
 endif(RASPBERRYPI)
 
 add_library(sender
