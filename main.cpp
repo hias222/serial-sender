@@ -6,7 +6,10 @@
 #include "send.h"
 #endif
 
-#define BASIC_PORTNAME "/dev/ttyAMA0"
+// GPIO
+// #define BASIC_PORTNAME "/dev/ttyAMA0"
+// USB
+#define BASIC_PORTNAME "/dev/ttyUSB0"
 
 void usage(char *prog)
 {

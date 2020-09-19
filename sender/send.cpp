@@ -9,7 +9,7 @@
 #include <string.h>
 #include <string>
 
-// #define debug
+#define debug
 
 #ifndef WIN32
 #include <time.h>
