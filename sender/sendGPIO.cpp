@@ -96,7 +96,16 @@ int send(char *portname)
                 //int serWrite(unsigned handle, char *buf, unsigned count)
                 serWrite(USBHandle, &mychar, sizeof mychar);
 #ifdef debug
-                printf("%02x ", num);
+                printf("%02x ", mychar);
+                if (num == 0x00)
+                {
+                    printf(".");
+                }
+
+                if ((mychar & COLORADO_ADDRESS_WORD_MASK) == COLORADO_ADDRESS_WORD_MASK)
+                {
+                    printf("\n %02x \n", COLORADO_ADDRESS_WORD_MASK);
+                }
 #endif
 
                 //res = write(fd, &mychar, sizeof mychar);

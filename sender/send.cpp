@@ -109,7 +109,6 @@ int send(char *portname)
                 hexa[1] = buff[g];
                 int num = (int)strtol(hexa, NULL, 16); // number base 16
 
-
 #ifdef debug
                 printf("%02x ", num);
 
