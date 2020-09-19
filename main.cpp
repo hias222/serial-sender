@@ -7,9 +7,9 @@
 #endif
 
 // GPIO
-// #define BASIC_PORTNAME "/dev/ttyAMA0"
+#define BASIC_PORTNAME "/dev/ttyAMA0"
 // USB
-#define BASIC_PORTNAME "/dev/ttyUSB0"
+// #define BASIC_PORTNAME "/dev/ttyUSB0"
 
 void usage(char *prog)
 {
