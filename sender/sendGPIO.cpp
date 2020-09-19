@@ -36,6 +36,11 @@ int send(char *portname)
     char text[2048];
     char buff[255];
 
+    struct timespec ts;
+    ts.tv_sec = 0;
+    // ts.tv_nsec = 100000000;
+    ts.tv_nsec = 2000000;
+
     char filename[] = "test.txt";
 
     if (gpioInitialise() < 0)
@@ -82,6 +87,7 @@ int send(char *portname)
         {
             if (isfirst)
             {
+                nanosleep(&ts, NULL);
                 isfirst = false;
                 hexa[0] = buff[g];
             }
