@@ -121,7 +121,7 @@ int send(char *portname)
                 unsigned char mychar = num;
 
 #ifdef debug
-                if (mychar & COLORADO_ADDRESS_WORD_MASK) == COLORADO_ADDRESS_WORD_MASK)
+                if ((mychar & COLORADO_ADDRESS_WORD_MASK) == COLORADO_ADDRESS_WORD_MASK)
                 {
                     printf("\n %02x \n", COLORADO_ADDRESS_WORD_MASK);
                 }
