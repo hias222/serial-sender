@@ -17,5 +17,12 @@ if [ $? = 0 ]; then
   exit 1
 fi
 
+# BCM2711
+
+grep -q BCM2711 /proc/cpuinfo
+if [ $? = 0 ]; then
+  echo Pi
+  exit 1
+fi
 
 exit 0
