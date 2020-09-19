@@ -17,6 +17,8 @@
 #define MOSI 19
 #define SCLK 12
 
+#define debug
+
 #define COLORADO_ADDRESS_WORD_MASK 0x80
 
 //#define MODEMDEVICE "/dev/serial0"
@@ -67,6 +69,10 @@ int send(char *portname)
 
     char hexa[2];
 
+#ifdef debug
+                printf("start reading file\n",);
+#endif
+
     while (fgets(buff, 255, (FILE *)fp) != NULL)
     {
         i++;
@@ -85,10 +91,13 @@ int send(char *portname)
                 hexa[1] = buff[g];
                 int num = (int)strtol(hexa, NULL, 16); // number base 16
 
-                //unsigned 
-                char mychar = num;
+                unsigned char mychar = num;
                 //int serWrite(unsigned handle, char *buf, unsigned count)
                 serWrite(USBHandle, &mychar, sizeof mychar);
+#ifdef debug
+                printf("%02x ", num);
+#endif
+
                 //res = write(fd, &mychar, sizeof mychar);
             }
         }
