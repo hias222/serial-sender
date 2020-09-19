@@ -39,7 +39,7 @@ int send(char *portname)
     struct timespec ts;
     ts.tv_sec = 0;
     // ts.tv_nsec = 100000000;
-    ts.tv_nsec = 500000;
+    ts.tv_nsec = 900000;
 
     char filename[] = "test.txt";
 
