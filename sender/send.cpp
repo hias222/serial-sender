@@ -108,6 +108,8 @@ int send(char *portname)
                 isfirst = true;
                 hexa[1] = buff[g];
                 int num = (int)strtol(hexa, NULL, 16); // number base 16
+
+
 #ifdef debug
                 printf("%02x ", num);
 
@@ -117,6 +119,14 @@ int send(char *portname)
                 }
 #endif
                 unsigned char mychar = num;
+
+#ifdef debug
+                if (mychar & COLORADO_ADDRESS_WORD_MASK) == COLORADO_ADDRESS_WORD_MASK)
+                {
+                    printf("\n %02x \n", COLORADO_ADDRESS_WORD_MASK);
+                }
+#endif
+
                 res = write(fd, &mychar, sizeof mychar);
             }
         }
