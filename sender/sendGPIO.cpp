@@ -70,7 +70,7 @@ int send(char *portname)
     char hexa[2];
 
 #ifdef debug
-                printf("start reading file\n",);
+                printf("start reading file\n");
 #endif
 
     while (fgets(buff, 255, (FILE *)fp) != NULL)
