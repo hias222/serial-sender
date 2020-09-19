@@ -91,7 +91,8 @@ int send(char *portname)
                 hexa[1] = buff[g];
                 int num = (int)strtol(hexa, NULL, 16); // number base 16
 
-                unsigned char mychar = num;
+                //unsigned 
+                char mychar = num;
                 //int serWrite(unsigned handle, char *buf, unsigned count)
                 serWrite(USBHandle, &mychar, sizeof mychar);
 #ifdef debug
