@@ -32,7 +32,7 @@ volatile int STOP = FALSE;
 int send(char *portname)
 {
     char filename[] = "test.txt";
-    int fd, c, res;
+    int fd, c, res, flag, baudrate;
     struct termios oldtio, newtio;
     FILE *fp;
     char buff[255];
@@ -40,7 +40,7 @@ int send(char *portname)
     struct timespec ts;
     ts.tv_sec = 0;
     // ts.tv_nsec = 100000000;
-    ts.tv_nsec = 20000;
+    ts.tv_nsec = 100000000;
 
     printf("using %s \n", portname);
 
@@ -53,6 +53,7 @@ int send(char *portname)
 
     tcgetattr(fd, &oldtio); /* save current port settings */
 
+    /*
     bzero(&newtio, sizeof(newtio));
     newtio.c_cflag = ~CRTSCTS & ~PARENB & ~CSTOPB;
     newtio.c_cflag |= CS8 | CLOCAL | CREAD;
@@ -63,13 +64,60 @@ int send(char *portname)
     newtio.c_iflag = IGNPAR;
     newtio.c_oflag = 0;
 
-    /* set input mode (non-canonical, no echo,...) */
+    // set input mode (non-canonical, no echo,...) 
     newtio.c_lflag = 0;
 
-    newtio.c_cc[VTIME] = 0; /* inter-character timer unused */
-    newtio.c_cc[VMIN] = 1;  /* blocking read until 5 chars received */
+    newtio.c_cc[VTIME] = 0; // inter-character timer unused 
+    newtio.c_cc[VMIN] = 1;  // blocking read until 5 chars received 
 
     tcflush(fd, TCIFLUSH);
+
+*/
+
+    flag = fcntl(fd, F_GETFL, 0);
+    fcntl(fd, F_SETFL, flag & ~O_NDELAY);
+
+    //set baudrate to 0 and go back to normal
+    printf("set baudrate to 0......\n");
+    tcgetattr(fd, &newtio);
+    tcgetattr(fd, &oldtio);
+    cfsetospeed(&newtio, B0);
+    cfsetispeed(&newtio, B0);
+    tcsetattr(fd, TCSANOW, &newtio);
+    sleep(1);
+    tcsetattr(fd, TCSANOW, &oldtio);
+    printf("baudrate is back to normal......\n");
+
+    tcgetattr(fd, &newtio);
+
+    baudrate = B9600;
+    cfsetospeed(&newtio, baudrate);
+    cfsetispeed(&newtio, baudrate);
+
+    newtio.c_cflag = (newtio.c_cflag & ~CSIZE) | CS8;
+
+    //set into raw, no echo mode
+    newtio.c_iflag = IGNBRK;
+    newtio.c_lflag = 0;
+    newtio.c_oflag = 0;
+    newtio.c_cflag |= CLOCAL | CREAD;
+
+    newtio.c_cflag &= ~CRTSCTS;
+
+    //turn off software control
+    newtio.c_iflag &= ~(IXON | IXOFF | IXANY);
+
+    //no parity
+    newtio.c_cflag &= ~(PARENB | PARODD);
+
+    //1 stopbit
+    newtio.c_cflag &= ~CSTOPB;
+
+    newtio.c_cc[VTIME] = 0; // inter-character timer unused
+    newtio.c_cc[VMIN] = 1;  // blocking read until 5 chars received
+
+    tcflush(fd, TCIFLUSH);
+
     tcsetattr(fd, TCSANOW, &newtio);
 
     printf("ready\n");
@@ -86,7 +134,8 @@ int send(char *portname)
     int i = 0;
     bool isfirst = true;
 
-    char hexa[2];
+    char *hexa = new char[2];
+    //char hexa[] = "00";
 
     while (fgets(buff, 255, (FILE *)fp) != NULL)
     {
@@ -108,21 +157,22 @@ int send(char *portname)
                 isfirst = true;
                 hexa[1] = buff[g];
                 int num = (int)strtol(hexa, NULL, 16); // number base 16
+                unsigned char mychar = num;
 
 #ifdef debug
-                printf("%02x ", num);
 
+                printf("%02x ", mychar);
                 if (num == 0x00)
                 {
                     printf(".");
                 }
+
 #endif
-                unsigned char mychar = num;
 
 #ifdef debug
                 if ((mychar & COLORADO_ADDRESS_WORD_MASK) == COLORADO_ADDRESS_WORD_MASK)
                 {
-                    printf("\n %02x \n", COLORADO_ADDRESS_WORD_MASK);
+                    printf("\n %02x %02x \n", COLORADO_ADDRESS_WORD_MASK, mychar);
                 }
 #endif
 
