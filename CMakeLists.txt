@@ -10,7 +10,9 @@ if(APPLE)
 endif()
 
 if(WIN32)
+    message(STATUS "FOUND Windows no RPI")
     set(ENV{OPENSSL_ROOT_DIR} "C:/Users/User/git/vcpkg/installed/x86-windows")
+    set(RASPBERRYPI "0")
 endif()
 
 include(CTest)

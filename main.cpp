@@ -2,12 +2,12 @@
 
 #ifdef _WIN32
 #include <sendwin.h>
+#define BASIC_PORTNAME "2"
 #else
 #include "send.h"
+#define BASIC_PORTNAME "/dev/ttyAMA0"
 #endif
 
-// GPIO
-#define BASIC_PORTNAME "/dev/ttyAMA0"
 // USB
 // #define BASIC_PORTNAME "/dev/ttyUSB0"
 

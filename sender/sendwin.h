@@ -4,4 +4,4 @@
 
 using namespace std;
 
-int send();
+int send(char *portname);

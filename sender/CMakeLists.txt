@@ -3,7 +3,6 @@ if (WIN32)
 else (WIN32)
     if (RASPBERRYPI)
         message(STATUS "serial-sender RASPBERRY")
-        
     else(RASPBERRYPI)
         message(STATUS "serial-sender no RASPBERRY")
         set (OTHER_SRC send.cpp)
