@@ -5,11 +5,15 @@
 #define BASIC_PORTNAME "2"
 #else
 #include "send.h"
-#define BASIC_PORTNAME "/dev/ttyAMA0"
+//#define BASIC_PORTNAME "/dev/ttyAMA0"
+#define BASIC_PORTNAME "/dev/tty.usbserial-146120"
 #endif
 
 // USB
 // #define BASIC_PORTNAME "/dev/ttyUSB0"
+
+// /dev/tty.usbserial-146120
+// ftdi /dev/tty.usbserial-AG0K1QMP
 
 void usage(char *prog)
 {
