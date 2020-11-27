@@ -7,13 +7,9 @@
 #include "send.h"
 //#define BASIC_PORTNAME "/dev/ttyAMA0"
 //#define BASIC_PORTNAME "/dev/tty.usbserial-146120"
+#define BASIC_PORTNAME "/dev/cu.usbserial-FTBTCOC23"
+//#define BASIC_PORTNAME "/dev/ttyUSB0"
 #endif
-
-// USB
-#define BASIC_PORTNAME "/dev/ttyUSB0"
-
-// /dev/tty.usbserial-146120
-// ftdi /dev/tty.usbserial-AG0K1QMP
 
 void usage(char *prog)
 {
@@ -58,6 +54,9 @@ int main(int argc, char *argv[])
     }
 
     printf("start....\n");
+
+    printf("for mac take /deC/cu.xxx\n");
+    printf("for win take 1,2,3...\n");
 
     //printf("for internal testing socat -d -d pty,raw,echo=0 pty,raw,echo=0 ");
     send(portname);
