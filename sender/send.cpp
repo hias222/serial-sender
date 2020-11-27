@@ -94,7 +94,7 @@ int send(char *portname)
     cfsetospeed(&newtio, baudrate);
     cfsetispeed(&newtio, baudrate);
 
-    newtio.c_cflag = (newtio.c_cflag & ~CSIZE) | CS8;
+    //newtio.c_cflag = (newtio.c_cflag & ~CSIZE) | CS8;
 
     //set into raw, no echo mode
     newtio.c_iflag = 0;
