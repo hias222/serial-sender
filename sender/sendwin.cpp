@@ -48,7 +48,11 @@ int send(char *portname)
     wchar_t pszPortName[10] = {0}; //com port id
     wchar_t PortNo[20] = {0};      //contain friendly name
 
-    printf("port: %s", comports[comport_number]);
+    FILE *fp;
+    char filename[] = "test.txt";
+    char buff[255];
+
+    printf("port: %s \n", comports[comport_number]);
     fflush(stdout);
     try
     {
@@ -79,7 +83,7 @@ int send(char *portname)
         dcbSerialParams.BaudRate = CBR_9600;   //BaudRate = 9600
         dcbSerialParams.ByteSize = 8;          //ByteSize = 8
         dcbSerialParams.StopBits = ONESTOPBIT; //StopBits = 1
-        dcbSerialParams.Parity = NOPARITY;     //Parity = None
+        dcbSerialParams.Parity = PARITY_EVEN; // NOPARITY Parity = None
 
         Status = SetCommState(hComm, &dcbSerialParams);
 
@@ -143,13 +147,58 @@ int send(char *portname)
         bool connectsuccess = true;
         int i = 0;
 
+        printf("opening file %s\n", filename);
+
+        if (!(fp = fopen(filename, "r")))
+        {
+            printf("error opening file\n");
+            return 1;
+        }
+
+        int ik = 0;
+        bool isfirst = true;
+        char *hexa = new char[2];
+
+        while (fgets(buff, 255, (FILE *)fp) != NULL)
+        {
+            ik++;
+            for (int g = 0; g < strlen(buff); g++)
+            {
+                if (isfirst)
+                {
+                    isfirst = false;
+                    hexa[0] = buff[g];
+                }
+                else
+                {
+                    isfirst = true;
+                    hexa[1] = buff[g];
+                    int num = (int)strtol(hexa, NULL, 16); // number base 16
+                    unsigned char mychar = num;
+                    WriteFile(hComm, &mychar, sizeof(mychar), &NoBytesWrite, NULL);
+
+                    printf("%02x ", mychar);
+                    if ((mychar & COLORADO_ADDRESS_WORD_MASK) == COLORADO_ADDRESS_WORD_MASK)
+                    {
+                        printf("\n");
+                    }
+                }
+            }
+#ifdef WIN32
+            Sleep(100);
+#else
+            nanosleep(&ts, NULL);
+#endif
+        }
+
+        /*
         char message[] = "\xbe\x70\x6f\x5f\x40\x30\x20\xa1\x0d\x1f\x2f\x3f\x4d\x5d\x6f\x7f\xbc\x0e\x1e\x20\x30\x4d\x5d\x6a\x7e\xbd\x0d\x1f\x2f\x3f\x4d\x5d\x6f\x7f\xba\x0d\x1a\x20\x30\x4c\x59\x66\x77\xbb\x0d\x1f\x2f\x3f\x4d\x5d\x6f\x7f\xb8\x0c\x19\x20\x30\x4b\x5f\x6e\x79\xb9\x0d\x1f\x2f\x3f\x4d\x5d\x6f\x7f\xb6\x0b\x18\x20\x30\x4b\x5c\x6d\x77\xb7\x0d\x1f\x2f\x3f\x4d\x5d\x6f\x7f\xbe\x70\x6f\x5f\x40\x30\x20\xb4\x0a\x17\x20\x30\x4a\x5d\x6f\x78\xb5\x0d\x1f\x2f\x3f\x4d\x5d\x6f\x7f\xb2\x09\x1d\x20\x30\x4d\x58\x68\x7b\xb3\x0d\x1f\x2f\x3f\x4d\x5d\x6f\x7f\xb0\x08\x1c\x20\x30\x4c\x5f\x6c\x79\xb1\x0d\x1f\x2f\x3f\x4d\x5d\x6f\x7f\xae\x07\x1b\x20\x30\x4c\x5c\x6b\x7d\xaf\x0d\x1f\x2f\x3f\x4d\x5d\x6f\x7f\x7f";
         char buf[] = "\x80";
 
         Status = WriteFile(hComm, buf, strlen(buf), &NoBytesWrite, NULL);
         Status = WriteFile(hComm, message, strlen(message), &NoBytesWrite, NULL);
         Status = WriteFile(hComm, buf, strlen(buf), &NoBytesWrite, NULL);
-
+*/
         CloseHandle(hComm); //Closing the Serial Port
         printf("closing \n");
     }
