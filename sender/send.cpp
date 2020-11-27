@@ -97,18 +97,13 @@ int send(char *portname)
     newtio.c_cflag = (newtio.c_cflag & ~CSIZE) | CS8;
 
     //set into raw, no echo mode
-    newtio.c_iflag = IGNBRK;
+    newtio.c_iflag = 0;
+
     newtio.c_lflag = 0;
     newtio.c_oflag = 0;
-    newtio.c_cflag |= CLOCAL | CREAD;
+    newtio.c_cflag = 0;
 
-    newtio.c_cflag &= ~CRTSCTS;
-
-    //turn off software control
-    newtio.c_iflag &= ~(IXON | IXOFF | IXANY);
-
-    //no parity
-    newtio.c_cflag &= ~(PARENB | PARODD);
+    newtio.c_cflag = PARENB;
 
     //1 stopbit
     newtio.c_cflag &= ~CSTOPB;
@@ -157,22 +152,15 @@ int send(char *portname)
 
 #ifdef debug
 
-                printf("%02x ", mychar);
                 if ((mychar & COLORADO_ADDRESS_WORD_MASK) == COLORADO_ADDRESS_WORD_MASK)
                 {
                     printf("\n");
                 }
+                printf("%02x ", mychar);
 
 #endif
 
-#ifdef debugext
-                if ((mychar & COLORADO_ADDRESS_WORD_MASK) == COLORADO_ADDRESS_WORD_MASK)
-                {
-                    printf("\n %02x %02x \n", COLORADO_ADDRESS_WORD_MASK, mychar);
-                }
-#endif
-
-                res = write(fd, &mychar, sizeof mychar);
+                res = write(fd, &mychar, sizeof(mychar));
             }
         }
 // wait some time
