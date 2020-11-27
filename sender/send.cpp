@@ -141,10 +141,6 @@ int send(char *portname)
     {
         i++;
 
-#ifdef debug
-        printf("line %d\n", i);
-#endif
-
         for (int g = 0; g < strlen(buff); g++)
         {
             if (isfirst)
@@ -162,14 +158,14 @@ int send(char *portname)
 #ifdef debug
 
                 printf("%02x ", mychar);
-                if (num == 0x00)
+                if ((mychar & COLORADO_ADDRESS_WORD_MASK) == COLORADO_ADDRESS_WORD_MASK)
                 {
-                    printf(".");
+                    printf("\n");
                 }
 
 #endif
 
-#ifdef debug
+#ifdef debugext
                 if ((mychar & COLORADO_ADDRESS_WORD_MASK) == COLORADO_ADDRESS_WORD_MASK)
                 {
                     printf("\n %02x %02x \n", COLORADO_ADDRESS_WORD_MASK, mychar);
