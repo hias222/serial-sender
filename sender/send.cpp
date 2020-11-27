@@ -44,6 +44,7 @@ int send(char *portname)
 
     printf("using %s \n", portname);
 
+    //fd = open(portname, O_RDWR | O_NOCTTY);
     fd = open(portname, O_RDWR | O_NOCTTY);
     if (fd < 0)
     {
@@ -51,6 +52,7 @@ int send(char *portname)
         return 1;
     }
 
+    printf("open succeded \n");
     tcgetattr(fd, &oldtio); /* save current port settings */
 
     /*
