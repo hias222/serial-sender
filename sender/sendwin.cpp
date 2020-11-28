@@ -11,6 +11,7 @@
 #ifdef _WIN32
 #include <Windows.h>
 #include <assert.h>
+#include <tchar.h>
 #endif
 
 #define RS232_PORTNR 32
@@ -18,6 +19,16 @@
 
 DWORD NoBytesWrite;
 using namespace std;
+
+void PrintCommState(DCB dcb)
+{
+    //  Print some of the DCB structure values
+    _tprintf(TEXT("\nBaudRate = %d, ByteSize = %d, Parity = %d, StopBits = %d\n"),
+             dcb.BaudRate,
+             dcb.ByteSize,
+             dcb.Parity,
+             dcb.StopBits);
+}
 
 int send(char *portname)
 {
@@ -70,8 +81,8 @@ int send(char *portname)
             return 1;
         }
 
-        //Setting the Parameters for the SerialPort
-        dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
+        SecureZeroMemory(&dcbSerialParams, sizeof(DCB));
+        dcbSerialParams.DCBlength = sizeof(DCB);
 
         Status = GetCommState(hComm, &dcbSerialParams); //retreives  the current settings
         if (Status == FALSE)
@@ -83,7 +94,7 @@ int send(char *portname)
         dcbSerialParams.BaudRate = CBR_9600;   //BaudRate = 9600
         dcbSerialParams.ByteSize = 8;          //ByteSize = 8
         dcbSerialParams.StopBits = ONESTOPBIT; //StopBits = 1
-        dcbSerialParams.Parity = PARITY_EVEN; // NOPARITY Parity = None
+        dcbSerialParams.Parity = EVENPARITY; // NOPARITY Parity = None
 
         Status = SetCommState(hComm, &dcbSerialParams);
 
@@ -92,6 +103,17 @@ int send(char *portname)
             printf_s("\nError to Setting DCB Structure\n\n");
             return false;
         }
+
+        printf("set colorado Parameters (9600, ByteSize = 8, Parity = 2, StopBits = 0)");
+        Status = GetCommState(hComm, &dcbSerialParams); //retreives  the current settings
+
+        if (Status == FALSE)
+        {
+            printf_s("\nError to Get the Com state\n\n");
+            return 1;
+        }
+
+        PrintCommState(dcbSerialParams);
 
         //Setting Timeouts
         timeouts.ReadIntervalTimeout = 50;
