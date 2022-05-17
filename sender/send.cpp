@@ -44,7 +44,7 @@ int send(char *portname)
 
     printf("using %s \n", portname);
 
-    //fd = open(portname, O_RDWR | O_NOCTTY);
+    // fd = open(portname, O_RDWR | O_NOCTTY);
     fd = open(portname, O_RDWR | O_NDELAY);
     if (fd < 0)
     {
@@ -58,7 +58,7 @@ int send(char *portname)
     flag = fcntl(fd, F_GETFL, 0);
     fcntl(fd, F_SETFL, flag & ~O_NDELAY);
 
-    //set baudrate to 0 and go back to normal
+    // set baudrate to 0 and go back to normal
     printf("set baudrate to 0......\n");
     tcgetattr(fd, &newtio);
     tcgetattr(fd, &oldtio);
@@ -72,12 +72,13 @@ int send(char *portname)
     tcgetattr(fd, &newtio);
 
     baudrate = B9600;
+    //baudrate = B19200;
     cfsetospeed(&newtio, baudrate);
     cfsetispeed(&newtio, baudrate);
 
-    //newtio.c_cflag = (newtio.c_cflag & ~CSIZE) | CS8;
+    // newtio.c_cflag = (newtio.c_cflag & ~CSIZE) | CS8;
 
-    //set into raw, no echo mode
+    // set into raw, no echo mode
     newtio.c_iflag = 0;
 
     newtio.c_lflag = 0;
@@ -86,7 +87,7 @@ int send(char *portname)
 
     newtio.c_cflag = PARENB;
 
-    //1 stopbit
+    // 1 stopbit
     newtio.c_cflag &= ~CSTOPB;
 
     newtio.c_cc[VTIME] = 0; // inter-character timer unused
@@ -101,52 +102,56 @@ int send(char *portname)
 
     printf("opening file %s\n", filename);
 
-    if (!(fp = fopen(filename, "r")))
-    {
-        printf("error opening file\n");
-        return 1;
-    }
-
     int i = 0;
     bool isfirst = true;
 
     char *hexa = new char[2];
 
-    while (fgets(buff, 255, (FILE *)fp) != NULL)
+    while (true)
     {
-        i++;
-        for (int g = 0; g < strlen(buff); g++)
+        if (!(fp = fopen(filename, "r")))
         {
-
-            if (isfirst)
-            {
-                isfirst = false;
-                hexa[0] = buff[g];
-            }
-            else
-            {
-                isfirst = true;
-                hexa[1] = buff[g];
-                int num = (int)strtol(hexa, NULL, 16); // number base 16
-                unsigned char mychar = num;
-
-                if ((mychar & COLORADO_ADDRESS_WORD_MASK) == COLORADO_ADDRESS_WORD_MASK)
-                {
-                    printf("\n");
-                }
-                printf("%02x ", mychar);
-                res = write(fd, &mychar, sizeof(mychar));
-            }
+            printf("error opening file\n");
+            return 1;
         }
+
+        while (fgets(buff, 255, (FILE *)fp) != NULL)
+        {
+            i++;
+            for (int g = 0; g < strlen(buff); g++)
+            {
+
+                if (isfirst)
+                {
+                    isfirst = false;
+                    hexa[0] = buff[g];
+                }
+                else
+                {
+                    isfirst = true;
+                    hexa[1] = buff[g];
+                    int num = (int)strtol(hexa, NULL, 16); // number base 16
+                    unsigned char mychar = num;
+
+                    // if ((mychar & COLORADO_ADDRESS_WORD_MASK) == COLORADO_ADDRESS_WORD_MASK)
+                    //{
+                    //     printf("\n");
+                    // }
+                    // printf("%02x ", mychar);
+                    res = write(fd, &mychar, sizeof(mychar));
+                }
+            }
 // wait some time
-#ifdef WIN32
-        Sleep(100);
-#else
-        nanosleep(&ts, NULL);
-#endif
+//#ifdef WIN32
+//            Sleep(100);
+//#else
+//            nanosleep(&ts, NULL);
+//#endif
+//        }
+        printf("end test.txt\n");
+        fclose(fp);
     }
 
-    fclose(fp);
     printf("\n\n");
     printf("write %d\n", res);
 
