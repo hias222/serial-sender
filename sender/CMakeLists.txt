@@ -11,6 +11,7 @@ endif (WIN32)
 
 if (ISFTDI)
     message(STATUS "only FTDI")
+    set (OTHER_SRC send.cpp)
 else (ISFTDI)
     if(RASPBERRYPI)
         message(STATUS "serial-sender add gpio libs")
@@ -45,13 +46,12 @@ else (ISFTDI)
 
         set (OTHER_SRC sendGPIO.cpp)
 
-        add_library(sender
-                ${OTHER_SRC}
-            )
-
-
     endif(RASPBERRYPI)
 endif (ISFTDI)
+
+add_library(sender
+        ${OTHER_SRC}
+    )
 
 
 if (ISFTDI)
