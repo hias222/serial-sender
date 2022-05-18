@@ -55,7 +55,16 @@ int main(int argc, char *argv[])
 
     printf("start....\n");
 
-    printf("for mac take /deC/cu.xxx\n");
+    printf("RPI:\n");
+    printf("RPI FTDI not enabled\n");
+    printf("RPI lsmod | grep ftdi_sio \n");
+    printf("RPI change blacklist /etc/modprobe.d/black.. \n");
+    printf("RPI disable service colorado \n");
+    printf("RPI reboot \n");
+    printf("RPI modprobe ftdi_sio \n");
+    printf("RPI ./serial-sender -p /dev/ttyUSB0 \n");
+
+    printf("for mac take /dev/cu.xxx\n");
     printf("for win take 1,2,3...\n");
 
     //printf("for internal testing socat -d -d pty,raw,echo=0 pty,raw,echo=0 ");
