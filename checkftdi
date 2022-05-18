@@ -1,0 +1,9 @@
+#!/bin/bash
+
+echo "search for ISFTDI"
+
+# use ftdi
+exit 1
+
+# no ftdi
+#exit 0

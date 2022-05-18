@@ -1,8 +1,14 @@
 cmake_minimum_required(VERSION 3.0.0)
 project(serial VERSION 0.1.0)
 
-execute_process(COMMAND bash ${CMAKE_HOME_DIRECTORY}/checkapi RESULT_VARIABLE RASPBERRYPI)
+if (NOT WIN32)
+    EXECUTE_PROCESS(COMMAND bash ${CMAKE_HOME_DIRECTORY}/checkapi RESULT_VARIABLE RASPBERRYPI)
+    EXECUTE_PROCESS(COMMAND bash ${CMAKE_HOME_DIRECTORY}/checkftdi RESULT_VARIABLE ISFTDI)
+endif()
 
+if (ISFTDI)
+    message(STATUS "ISFTDI")
+endif (ISFTDI)
 
 if(APPLE)
     set(ENV{OPENSSL_ROOT_DIR} "/usr/local/opt/openssl@1.1")
