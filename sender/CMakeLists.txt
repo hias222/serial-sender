@@ -10,7 +10,7 @@ else (WIN32)
 endif (WIN32)
 
 if (ISFTDI)
-    message(STATUS "ISFTDI")
+    message(STATUS "only FTDI")
 else (ISFTDI)
     if(RASPBERRYPI)
         message(STATUS "serial-sender add gpio libs")
@@ -44,22 +44,27 @@ else (ISFTDI)
             pigpio_INCLUDE_DIR pigpio_LIBRARY pigpiod_if_LIBRARY pigpiod_if2_LIBRARY)
 
         set (OTHER_SRC sendGPIO.cpp)
-    endif(RASPBERRYPI)
-endif (ISFTDI)
 
-add_library(sender
+        add_library(sender
                 ${OTHER_SRC}
             )
 
+
+    endif(RASPBERRYPI)
+endif (ISFTDI)
+
+
 if (ISFTDI)
     message(STATUS "ISFTDI")
+    if(RASPBERRYPI)
+        message(STATUS "serial-sender link")
+        target_link_libraries(sender)
+    endif(RASPBERRYPI)
 else (ISFTDI)
-
     if(RASPBERRYPI)
         message(STATUS "serial-sender link pigpio")
         target_link_libraries(sender pigpio)
     endif(RASPBERRYPI)
-
 endif (ISFTDI)
 
 target_include_directories(sender PUBLIC
