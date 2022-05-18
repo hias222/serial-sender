@@ -72,7 +72,7 @@ int send(char *portname)
     tcgetattr(fd, &newtio);
 
     baudrate = B9600;
-    //baudrate = B19200;
+    // baudrate = B19200;
     cfsetospeed(&newtio, baudrate);
     cfsetispeed(&newtio, baudrate);
 
@@ -141,13 +141,13 @@ int send(char *portname)
                     res = write(fd, &mychar, sizeof(mychar));
                 }
             }
-// wait some time
-//#ifdef WIN32
-//            Sleep(100);
-//#else
-//            nanosleep(&ts, NULL);
-//#endif
-//        }
+            // wait some time
+            //#ifdef WIN32
+            //            Sleep(100);
+            //#else
+            //            nanosleep(&ts, NULL);
+            //#endif
+        }
         printf("end test.txt\n");
         fclose(fp);
     }
