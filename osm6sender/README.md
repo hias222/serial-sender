@@ -10,15 +10,36 @@ Dieses Projekt simuliert eine **Swiss Timing Quantum** oder **ARES21** Zeitmessk
 
 ---
 
-## 🛠️ Voraussetzungen
+## 🛠️ Voraussetzungen & Installation
 
-### 1. Python-Bibliotheken
-Installieren Sie die benötigte FTDI-Erweiterung für Python:
+### 1. Virtuelle Umgebung einrichten (venv)
+Es wird dringend empfohlen, das Projekt in einer isolierten virtuellen Umgebung zu installieren, um Konflikte mit globalen Python-Paketen zu vermeiden.
+
+**Unter Windows:**
+```bash
+# 1. Virtuelle Umgebung erstellen
+python -m venv venv
+
+# 2. Umgebung aktivieren
+.\venv\Scripts\activate
+```
+
+**Unter Linux / macOS:**
+```bash
+# 1. Virtuelle Umgebung erstellen
+python3 -m venv venv
+
+# 2. Umgebung aktivieren
+source venv/bin/activate
+```
+
+### 2. Python-Bibliotheken installieren
+Installieren Sie nach der Aktivierung der virtuellen Umgebung die benötigte FTDI-Erweiterung:
 ```bash
 pip install pyftdi
 ```
 
-### 2. Spezielle Treiber-Vorbereitung (Wichtig für Windows)
+### 3. Spezielle Treiber-Vorbereitung (Wichtig für Windows)
 Da `pyftdi` auf der systemunabhängigen Bibliothek `libusb` aufbaut, akzeptiert es unter Windows **nicht** den Standard-VCP-Treiber (Virtual COM Port) von FTDI. Der USB-Schnittstellentreiber muss einmalig für den direkten Zugriff freigeschaltet werden:
 
 1. **Laden** Sie das kostenlose Tool **[Zadig](https://akeo.ie)** herunter.
@@ -32,10 +53,10 @@ Da `pyftdi` auf der systemunabhängigen Bibliothek `libusb` aufbaut, akzeptiert 
 
 ---
 
-## 📦 Installation & Konfiguration
+## 📦 Konfiguration
 
 1. **Speichern** Sie den untenstehenden Python-Code in einer Datei namens `osm6_simulator.py`.
-2. **Starten** Sie das Skript einmalig, um die angeschlossenen FTDI-Geräte aufzulisten:
+2. **Starten** Sie das Skript bei aktiver virtueller Umgebung einmalig, um die angeschlossenen FTDI-Geräte aufzulisten:
    ```bash
    python osm6_simulator.py
    ```
@@ -73,6 +94,12 @@ python osm6_simulator.py
  Zeit:       >>> 21.89 <<<
  Raw-Hex:    0102083249202F203034303033303230322020303304;010208103230310220202020202032312E38392004
 ==========================================================
+```
+
+### Virtuelle Umgebung verlassen
+Wenn Sie fertig sind, können Sie die Umgebung mit folgendem Befehl wieder deaktivieren:
+```bash
+deactivate
 ```
 
 ---
@@ -123,14 +150,14 @@ KIND_OF_TIMES = {
 def decode_and_log(p1_bytes: bytes, p2_bytes: bytes, index: int):
     """Analysiert die Rohbytes und gibt ein gut lesbares Protokoll-Log aus."""
     try:
-        a = chr(p1_bytes[3])
-        b = chr(p1_bytes[4])
+        a = chr(p1_bytes)
+        b = chr(p1_bytes)
         ee = p1_bytes[8:10].decode('ascii')
         fff = p1_bytes[10:13].decode('ascii')
         gg = p1_bytes[13:15].decode('ascii')
         hh = p1_bytes[17:19].decode('ascii').strip()
 
-        j = chr(p2_bytes[4])
+        j = chr(p2_bytes)
         kk = p2_bytes[5:7].decode('ascii')
         
         stx_index = p2_bytes.find(STX, 4)
@@ -187,7 +214,7 @@ def generate_osm6_pair(msg_type: str, kind_of_time: str, time_type: str,
 
 def save_packets_to_file(filename: str):
     """Generiert Testdaten und speichert ein Paar pro Zeile als Hex ab."""
-    active_lanes = [1, 2, 3, 4]
+    active_lanes =
     
     with open(filename, 'w', encoding='utf-8') as f:
         # Zwischenzeit
@@ -208,22 +235,3 @@ def save_packets_to_file(filename: str):
 
     print(f"[*] Daten erfolgreich in '{filename}' exportiert.")
 
-def send_from_file_ftdi(filename: str, ftdi_url: str):
-    """Liest die Datei zeilenweise aus und sendet sie direkt via pyftdi-Treiber."""
-    port = None
-    try:
-        port = serial_for_url(ftdi_url, baudrate=9600, bytesize=8, parity='N', stopbits=1)
-        print(f"[*] FTDI-Gerät ({ftdi_url}) erfolgreich initialisiert (9600 8N1).")
-    except Exception as e:
-        print(f"[!] FTDI-Initialisierungsfehler: {e}")
-        print("[!] Sende-Vorgang abgebrochen. Es wird nur der Dateiinhalt geloggt.")
-        port = None
-
-    try:
-        with open(filename, 'r', encoding='utf-8') as f:
-            for index, line in enumerate(f, 1):
-                line = line.strip()
-                if not line or ";" not in line:
-                    continue
-                
-                part1_hex, part2_hex = line.split(";")
