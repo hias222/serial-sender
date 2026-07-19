@@ -168,7 +168,8 @@ if __name__ == "__main__":
     
     # Standard-FTDI-URL für das erste gefundene Gerät (Interface 1)
     # Syntax: ftdi://ftdi:<chip_typ>:<seriennummer>/<interface> oder allgemein:
-    FTDI_DEVICE_URL = 'ftdi://ftdi:232h/1' 
+    # FTDI_DEVICE_URL = 'ftdi://ftdi:232h/1' 
+    FTDI_DEVICE_URL = 'ftdi://ftdi:232:AG0K1QMP/1'  # Beispiel für ein spezifisches Gerät (ändern Sie dies nach Bedarf)
     
     # 2. Datei erzeugen
     save_packets_to_file(LOG_FILE)
