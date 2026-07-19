@@ -3,6 +3,7 @@
 
 build
 .vscode
+.DS_Store
 
 ### CMake ###
 CMakeLists.txt.user
