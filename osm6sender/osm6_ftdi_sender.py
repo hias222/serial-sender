@@ -28,11 +28,29 @@ KIND_OF_TIMES = {
     'B': 'Manueller Handtaster (Button only)'
 }
 
+def decode_lanes(byte1, byte2):
+    lanes = []
+    
+    # Bahnen 1 bis 5 aus byte1 extrahieren
+    for i in range(5):
+        if byte1 & (1 << i):
+            lanes.append(i + 1)
+            
+    # Bahnen 6 bis 10 aus byte2 extrahieren
+    for i in range(5):
+        if byte2 & (1 << i):
+            lanes.append(i + 6)
+            
+    return lanes
+
 def decode_and_log(p1_bytes: bytes, p2_bytes: bytes, index: int):
     """Analysiert die Rohbytes und gibt ein gut lesbares Protokoll-Log aus."""
     try:
         a = chr(p1_bytes[3])
         b = chr(p1_bytes[4])
+        c = chr(p1_bytes[5])
+        dd_hex = p1_bytes[6:8].decode('ascii') # 2 Bytes für die genutzten Bahnen
+        dd = decode_lanes(p1_bytes[6], p1_bytes[7])
         ee = p1_bytes[8:10].decode('ascii')
         fff = p1_bytes[10:13].decode('ascii')
         gg = p1_bytes[13:15].decode('ascii')
@@ -55,6 +73,9 @@ def decode_and_log(p1_bytes: bytes, p2_bytes: bytes, index: int):
         print(f" Details:    Bahn {j} | Akt.Runde {int(kk)} | {rank_str}")
         print(f" Zeit:       >>> {time_str} <<<")
         print(f" Raw-Hex:    {p1_bytes.hex().upper()};{p2_bytes.hex().upper()}")
+        print(f" Lanes:      {dd}")
+        print(f" 1: {a} {b} :{c}: :{dd_hex}: {ee} {fff} {gg} {SPACE} {SPACE} {hh}")
+        print(f" 2: {j} {kk} STX {time_str}")
         print("==========================================================")
     except Exception as e:
         print(f"\n[!] Fehler beim Dekodieren für das Log: {e}")
@@ -78,15 +99,18 @@ def generate_osm6_pair(msg_type: str, kind_of_time: str, time_type: str,
     b = str(kind_of_time).encode('ascii')
     c = str(time_type).encode('ascii') if time_type else SPACE
     dd = calculate_used_lanes(lanes)
-    ee = f"{lap:02d}".encode('ascii')
+    # ee = f"{lap:02d}".encode('ascii')
+    ee = SPACE + f"{lap:01d}".encode('ascii')
     fff = f"{event:03d}".encode('ascii')
     gg = f"{heat:02d}".encode('ascii')
-    hh = f"{rank:02d}".encode('ascii') if rank > 0 else b'  '
+    # hh = f"{rank:02d}".encode('ascii') if rank > 0 else b'  '
+    hh = SPACE + f"{rank:01d}".encode('ascii') if rank > 0 else b'  '
 
     part1 = SOH + STX + HOME + a + b + c + dd + ee + fff + gg + SPACE + SPACE + hh + EOT
 
     j = str(active_lane).encode('ascii')
-    kk = f"{current_lap:02d}".encode('ascii')
+    # kk = f"{current_lap:02d}".encode('ascii')
+    kk = SPACE + f"{current_lap:01d}".encode('ascii')
     formatted_time = f"{time_str:>11} ".encode('ascii')
 
     part2 = SOH + STX + HOME + LF + j + kk + STX + formatted_time + EOT
@@ -95,16 +119,32 @@ def generate_osm6_pair(msg_type: str, kind_of_time: str, time_type: str,
 
 def save_packets_to_file(filename: str):
     """Generiert Testdaten und speichert ein Paar pro Zeile als Hex ab."""
-    active_lanes = [1, 2, 3, 4]
+    active_lanes = [1,2,3,4,5,6,7,8,9,10]  # Beispiel: alle Bahnen aktiv
     
     with open(filename, 'w', encoding='utf-8') as f:
+        # Enter -> Ready
+        p1_split, p2_split = generate_osm6_pair(
+            msg_type="0", kind_of_time=" ", time_type=" ", 
+            lanes=active_lanes, lap=4, event=3, heat=2, 
+            rank=0, active_lane=0, current_lap=0, time_str=""
+        )
+        # f.write(f"{p1_split.hex()};{p2_split.hex()}\n")
+
+        # Start
+        p1_split, p2_split = generate_osm6_pair(
+            msg_type="2", kind_of_time="S", time_type=" ", 
+            lanes=active_lanes, lap=4, event=3, heat=2, 
+            rank=0, active_lane=0, current_lap=0, time_str=""
+        )
+        # f.write(f"{p1_split.hex()};{p2_split.hex()}\n")
+
         # Zwischenzeit
         p1_split, p2_split = generate_osm6_pair(
             msg_type="2", kind_of_time="I", time_type=" ", 
             lanes=active_lanes, lap=4, event=3, heat=2, 
-            rank=3, active_lane=2, current_lap=1, time_str="21.89"
+            rank=1, active_lane=2, current_lap=1, time_str="21.89"
         )
-        f.write(f"{p1_split.hex()};{p2_split.hex()}\n")
+        # f.write(f"{p1_split.hex()};{p2_split.hex()}\n")
         
         # Endzeit
         p1_final, p2_final = generate_osm6_pair(
@@ -113,6 +153,14 @@ def save_packets_to_file(filename: str):
             rank=2, active_lane=4, current_lap=4, time_str="1:22.07"
         )
         f.write(f"{p1_final.hex()};{p2_final.hex()}\n")
+
+        # End
+        p1_split, p2_split = generate_osm6_pair(
+            msg_type="1", kind_of_time="A", time_type=" ", 
+            lanes=active_lanes, lap=4, event=3, heat=2, 
+            rank=0, active_lane=0, current_lap=0, time_str=""
+        )
+        # f.write(f"{p1_split.hex()};{p2_split.hex()}\n")
 
     print(f"[*] Daten erfolgreich in '{filename}' exportiert.")
 
@@ -150,7 +198,7 @@ def send_from_file_ftdi(filename: str, ftdi_url: str):
                 time.sleep(0.1)  # Protokoll-Pause zwischen Kopf- und Zeitdaten
                 port.write(p2_bytes)
                 
-                time.sleep(1.5)  # Pause zwischen den simulierten Anschlägen
+                time.sleep(5)  # Pause zwischen den simulierten Anschlägen
                 
     except FileNotFoundError:
         print(f"[!] Datei '{filename}' nicht gefunden.")
