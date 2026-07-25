@@ -1,8 +1,13 @@
 # Quantum / OSM6 Timekeeping Simulator
 
+## Beispiele
+
+<https://github.com/hakostra/swimming-scoreboard>
+
 Dieses Projekt simuliert eine **Swiss Timing Quantum** oder **ARES21** Zeitmesskonsole. Es generiert regelkonforme Datenpakete nach dem **Omega OSM6 Data Handling Protokoll (OSM6 DH)**, lagert diese in eine externe Textdatei aus und sendet sie nativ über einen angeschlossenen **FTDI USB-Konverter** (z. B. RS485 oder RS232) an Ihre Wettkampfsoftware (wie Swimify, WinGrodan oder HY-Tek Meet Manager).
 
 ## 🚀 Features
+
 * **Nativer FTDI-Zugriff**: Arbeitet direkt mit dem FTDI D2XX/Libusb-Treiber über `pyftdi` (kein virtueller COM-Port im Betriebssystem nötig).
 * **Daten-Auslagerung**: Generiert und speichert Nachrichten-Paare (Part 1 & Part 2) als Hex-Strings zeilenweise in einer externen Textdatei.
 * **Live-Klartext-Log**: Dekodiert gesendete Daten live im Terminal (Wettkampf, Bahn, Runde, Platzierung, Zeit).

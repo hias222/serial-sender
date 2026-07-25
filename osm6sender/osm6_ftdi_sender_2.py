@@ -7,7 +7,8 @@ from pyftdi.ftdi import Ftdi
 SOH = b'\x01'
 HOME = b'\x08'
 STX = b'\x02'
-LF = b'\x10'
+# LF = b'\x10'
+LF = b'\x0A'
 EOT = b'\x04'
 SPACE = b'\x20'
 
