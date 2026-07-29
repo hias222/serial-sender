@@ -44,6 +44,20 @@ Installieren Sie nach der Aktivierung der virtuellen Umgebung die benötigte FTD
 pip install pyftdi
 ```
 
+### USM freischalten
+
+sudo vi /etc/udev/rules.d/99-ftdi.rules  
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", MODE="0666", GROUP="plugdev"  
+sudo udevadm control --reload-rules && sudo udevadm trigger  
+
+```bash
+#!/bin/bash
+
+. /opt/github/serial-sender/osm6sender/venv/bin/activate
+
+python /opt/github/serial-sender/osm6sender/osm6_ftdi_sender.py
+```bash
+
 ### 3. Spezielle Treiber-Vorbereitung (Wichtig für Windows)
 Da `pyftdi` auf der systemunabhängigen Bibliothek `libusb` aufbaut, akzeptiert es unter Windows **nicht** den Standard-VCP-Treiber (Virtual COM Port) von FTDI. Der USB-Schnittstellentreiber muss einmalig für den direkten Zugriff freigeschaltet werden:
 
