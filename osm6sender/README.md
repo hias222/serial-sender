@@ -46,8 +46,10 @@ pip install pyftdi
 
 ### USM freischalten
 
+Gruppe anpassen!
+
 sudo vi /etc/udev/rules.d/99-ftdi.rules  
-SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", MODE="0666", GROUP="plugdev"  
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", MODE="0666", GROUP="rock"  
 sudo udevadm control --reload-rules && sudo udevadm trigger  
 
 ```bash
