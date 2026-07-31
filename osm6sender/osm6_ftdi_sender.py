@@ -2,6 +2,7 @@ import time
 import sys
 from pyftdi.serialext import serial_for_url
 from pyftdi.ftdi import Ftdi
+import serial
 
 # Definition der Steuerzeichen laut Protokoll-Spezifikation (S. 3)
 SOH = b'\x01'
@@ -166,7 +167,7 @@ def send_from_file_ftdi(filename: str, ftdi_url: str):
     """Liest die Datei zeilenweise aus und sendet sie direkt via pyftdi-Treiber."""
     port = None
     try:
-        port = serial_for_url(ftdi_url, baudrate=9600, bytesize=8, parity='N', stopbits=1)
+        port = serial_for_url(ftdi_url, baudrate=9600, bytesize=serial.SEVENBITS, parity=serial.PARITY_EVEN, stopbits=serial.STOPBITS_ONE)
         print(f"[*] FTDI-Gerät ({ftdi_url}) erfolgreich initialisiert (9600 8N1).")
     except Exception as e:
         print(f"[!] FTDI-Initialisierungsfehler: {e}")
