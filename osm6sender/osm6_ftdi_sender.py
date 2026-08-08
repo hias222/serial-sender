@@ -141,31 +141,41 @@ def save_packets_to_file(filename: str):
     with open(filename, 'w', encoding='utf-8') as f:
         # 1. Ready
         p1, p2 = generate_osm6_pair("0", " ", " ", active_lanes, 4, 3, 2, 0, 0, 0, "")
-        f.write(f"{p1.hex()};{p2.hex()}\n")
+        f.write(f"{p1.hex()};{p2.hex()};5000\n")
 
         # 2. Start
         p1, p2 = generate_osm6_pair("2", "S", " ", active_lanes, 4, 3, 2, 0, 0, 0, "")
-        f.write(f"{p1.hex()};{p2.hex()}\n")
+        f.write(f"{p1.hex()};{p2.hex()};5000\n")
 
-        # 3. Zwischenzeit
+        # 3. Reaktionszeit
         p1, p2 = generate_osm6_pair("2", "R", " ", active_lanes, 4, 3, 2, 1, 4, 1, ".89")
-        f.write(f"{p1.hex()};{p2.hex()}\n")
+        f.write(f"{p1.hex()};{p2.hex()};100\n")
+        p1, p2 = generate_osm6_pair("2", "R", " ", active_lanes, 4, 3, 2, 1, 1, 1, ".70")
+        f.write(f"{p1.hex()};{p2.hex()};100\n")
+        p1, p2 = generate_osm6_pair("2", "R", " ", active_lanes, 4, 3, 2, 1, 2, 1, ".86")
+        f.write(f"{p1.hex()};{p2.hex()};100\n")
 
         # 3. Zwischenzeit
-        p1, p2 = generate_osm6_pair("2", "I", " ", active_lanes, 4, 3, 2, 1, 4, 1, "1:21.89")
-        f.write(f"{p1.hex()};{p2.hex()}\n")
+        p1, p2 = generate_osm6_pair("2", "I", " ", active_lanes, 4, 3, 2, 1, 4, 2, "1:21.89")
+        f.write(f"{p1.hex()};{p2.hex()};1000\n")
         
         # 4. Endzeit
-        p1, p2 = generate_osm6_pair("2", "A", " ", active_lanes, 4, 3, 2, 2, 4, 4, "2:22.07")
-        f.write(f"{p1.hex()};{p2.hex()}\n")
+        p1, p2 = generate_osm6_pair("2", "A", " ", active_lanes, 4, 3, 2, 2, 1, 4, "2:22.07")
+        f.write(f"{p1.hex()};{p2.hex()};500\n")
+        # 4. Endzeit
+        p1, p2 = generate_osm6_pair("2", "A", " ", active_lanes, 4, 3, 2, 2, 2, 4, "2:02.07")
+        f.write(f"{p1.hex()};{p2.hex()};500\n")
+        # 4. Endzeit
+        p1, p2 = generate_osm6_pair("2", "A", " ", active_lanes, 4, 3, 2, 2, 3, 4, "1:55.07")
+        f.write(f"{p1.hex()};{p2.hex()};5000\n")
 
         # 5. Offizielles Ende
         p1, p2 = generate_osm6_pair("1", " ", " ", active_lanes, 4, 3, 2, 0, 0, 0, "14:17:55.2")
-        f.write(f"{p1.hex()};{p2.hex()}\n")
+        f.write(f"{p1.hex()};{p2.hex()};5000\n")
         
         # 5. Offizielles Ende
         p1, p2 = generate_osm6_pair("0", " ", " ", active_lanes, 4, 3, 3, 0, 0, 0, "14:17:55.2")
-        f.write(f"{p1.hex()};{p2.hex()}\n")
+        f.write(f"{p1.hex()};{p2.hex()};500\n")
 
     print(f"[*] Daten erfolgreich in '{filename}' exportiert.")
 
@@ -210,11 +220,20 @@ def send_from_file_ftdi(filename: str, ftdi_url: str):
     try:
         with open(filename, 'r', encoding='utf-8') as f:
             for index, line in enumerate(f, 1):
+
                 line = line.strip()
                 if not line or ";" not in line:
                     continue
+
+                parts = line.split(";")
+                if len(parts) < 3:
+                    print(f"[!] Zeile {index} unvollständig. Erwartet: Hex1;Hex2;ms")
+                    continue
+                        
+                part1_hex, part2_hex, ms_str = parts[0], parts[1], parts[2]
+                 
                 
-                part1_hex, part2_hex = line.split(";")
+                # part1_hex, part2_hex = line.split(";")
                 p1_bytes = bytes.fromhex(part1_hex)
                 p2_bytes = bytes.fromhex(part2_hex)
                 
@@ -224,7 +243,12 @@ def send_from_file_ftdi(filename: str, ftdi_url: str):
                 time.sleep(0.1)  
                 port.write(p2_bytes)
                 
-                time.sleep(5)  
+                # Millisekunden in Sekunden umrechnen (z.B. 500ms = 0.5s)
+                wait_seconds = float(ms_str) / 1000.0
+
+                # Dynamische Wartezeit aus der Datei anwenden
+                print(f"[*] Zeile {index} gesendet. Warte {ms_str} ms...")
+                time.sleep(wait_seconds) 
                 
     except FileNotFoundError:
         print(f"[!] Datei '{filename}' nicht gefunden.")
