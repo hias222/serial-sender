@@ -2,6 +2,7 @@ import time
 import sys
 from pyftdi.serialext import serial_for_url
 from pyftdi.ftdi import Ftdi
+import threading  # Neu für den parallelen Alive-Takt
 import serial
 
 # Definition der Steuerzeichen laut Protokoll-Spezifikation (S. 3)
@@ -12,6 +13,8 @@ STX = b'\x02'
 LF = b'\x0A'
 EOT = b'\x04'
 SPACE = b'\x20'
+DC2 = b'\x12'
+DC4 = b'\x14'
 
 MSG_TYPES = {
     '0': 'Bereit am Start (Ready at start)',
@@ -29,6 +32,9 @@ KIND_OF_TIMES = {
     'R': 'Reaktionszeit (Reaction time)',
     'B': 'Manueller Handtaster (Button only)'
 }
+
+# Globale Variable für die Thread-Steuerung
+keep_alive_active = False
 
 def decode_lanes(byte1, byte2):
     lanes = []
@@ -163,8 +169,29 @@ def save_packets_to_file(filename: str):
 
     print(f"[*] Daten erfolgreich in '{filename}' exportiert.")
 
+def send_alive_message_ftdi(port):
+    """Sendet das Keep-Alive-Signal."""
+    alive_message = SOH + DC2 + b'9' + DC4 + b'TP' + EOT
+    try:
+        port.write(alive_message)
+        print("[Alive] 3s-Heartbeat gesendet.")
+    except Exception as e:
+        print(f"[Alive] Fehler beim Senden: {e}")
+
+def alive_loop(port):
+    """Hintergrund-Funktion: Sendet exakt alle 3 Sekunden."""
+    global keep_alive_active
+    while keep_alive_active:
+        send_alive_message_ftdi(port)
+        # Überprüft in kleinen Schritten (0.1s), ob abgebrochen werden soll
+        for _ in range(30): 
+            if not keep_alive_active:
+                break
+            time.sleep(0.1)
+
 def send_from_file_ftdi(filename: str, ftdi_url: str):
     """Liest die Datei zeilenweise aus und sendet sie direkt via pyftdi-Treiber."""
+    global keep_alive_active
     port = None
     try:
         port = serial_for_url(ftdi_url, baudrate=9600, bytesize=serial.SEVENBITS, parity=serial.PARITY_EVEN, stopbits=serial.STOPBITS_ONE)
@@ -173,6 +200,12 @@ def send_from_file_ftdi(filename: str, ftdi_url: str):
         print(f"[!] FTDI-Initialisierungsfehler: {e}")
         print("[*] Tipp: Nutzen Sie 'Ftdi.show_devices()', um angeschlossene IDs zu finden.")
         return
+
+    # Alive-Thread starten
+    keep_alive_active = True
+    alive_thread = threading.Thread(target=alive_loop, args=(port,), daemon=True)
+    alive_thread.start()
+    print("[*] Automatischer 3-Sekunden Alive-Takt gestartet.")
 
     try:
         with open(filename, 'r', encoding='utf-8') as f:
