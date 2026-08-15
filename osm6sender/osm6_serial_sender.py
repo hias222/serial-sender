@@ -223,7 +223,7 @@ def send_from_file_ftdi(filename: str, port_name: str):
     port = None
 
     try:
-        ser = serial.Serial(
+        port = serial.Serial(
             port=port_name, baudrate=9600, bytesize=serial.SEVENBITS,
             parity=serial.PARITY_EVEN, stopbits=serial.STOPBITS_ONE, timeout=1
         )
@@ -231,7 +231,7 @@ def send_from_file_ftdi(filename: str, port_name: str):
     except Exception as e:
         print(f"[!] Serieller Port Fehler: {e}")
         print("[!] Sende-Vorgang übersprungen. Logge nur den Dateiinhalt auf dem Bildschirm:")
-        ser = None
+        port = None
 
     # Alive-Thread starten
     keep_alive_active = True
