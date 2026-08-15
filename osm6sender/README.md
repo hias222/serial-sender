@@ -41,6 +41,7 @@ source venv/bin/activate
 ### 2. Python-Bibliotheken installieren
 Installieren Sie nach der Aktivierung der virtuellen Umgebung die benötigte FTDI-Erweiterung:
 ```bash
+pip install pyserial
 pip install pyftdi
 ```
 
@@ -50,6 +51,9 @@ Gruppe anpassen!
 
 sudo vi /etc/udev/rules.d/99-ftdi.rules  
 SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", MODE="0666", GROUP="rock"  
+# usb com
+SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", SYMLINK+="usbcom", MODE="0666", GROUP="rock"
+
 sudo udevadm control --reload-rules && sudo udevadm trigger  
 
 ```bash

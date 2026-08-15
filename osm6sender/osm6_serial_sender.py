@@ -281,7 +281,7 @@ def send_from_file_ftdi(filename: str, port_name: str):
 
 if __name__ == "__main__":
     LOG_FILE = "osm6_simulated.txt"
-    TARGET_PORT = "COM3"  # Anpassen an Ihren echten COM-Port
+    TARGET_PORT = "/dev/ttyUSB0"  # Anpassen an Ihren echten COM-Port
     # Schritt 1: Datei mit allen 5 Rennphasen erzeugen
     save_packets_to_file(LOG_FILE)
     
