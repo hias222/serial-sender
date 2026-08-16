@@ -1,6 +1,7 @@
 import os
 import csv
 from datetime import datetime
+import random
 
 # Definition der Steuerzeichen laut Protokoll-Spezifikation (S. 3)
 SOH = b'\x01'
@@ -52,7 +53,7 @@ def generate_osm6_pair(msg_type: str, kind_of_time: str, time_type: str,
 def save_packets_to_file(filename: str, lap: int, event: int, heat: int):
     """Generiert Testdaten und speichert ein Paar pro Zeile als Hex ab."""
     active_lanes = [3,4,5]
-    
+    lanes = 6
     
     with open(filename, 'w', encoding='utf-8') as f:
         # 1. Ready
@@ -81,28 +82,25 @@ def save_packets_to_file(filename: str, lap: int, event: int, heat: int):
         p1, p2 = generate_osm6_pair("2", "R", " ", active_lanes, lap, event, heat, 8, 8, 1, ".86")
         f.write(f"{p1.hex()};{p2.hex()};10000\n")
 
-        # 3. Zwischenzeit
-        p1, p2 = generate_osm6_pair("2", "I", " ", active_lanes, lap, event, heat, 2, 2, 2, "1:21.89")
-        f.write(f"{p1.hex()};{p2.hex()};5000\n")
-        p1, p2 = generate_osm6_pair("2", "I", " ", active_lanes, lap, event, heat, 1, 3, 2, "1:11.89")
-        f.write(f"{p1.hex()};{p2.hex()};5000\n")
+
+        if lap > 1:
+            for current_lap in range(1, lap):
+                for current_lane in range(1, lanes):
+                # 3. Zwischenzeit
+                    random_lane = random.randint(1, lanes)
+                    time_end = ":21.89"
+                    p1, p2 = generate_osm6_pair("2", "I", " ", active_lanes, lap, event, heat, random_lane, current_lane, current_lap, f"{current_lap}{time_end}")
+                    f.write(f"{p1.hex()};{p2.hex()};500\n")
+                p1, p2 = generate_osm6_pair("2", "I", " ", active_lanes, lap, event, heat, 3, lanes, current_lap, f"{current_lap}{time_end}")
+                f.write(f"{p1.hex()};{p2.hex()};10000\n")
         
         # 4. Endzeit
-        p1, p2 = generate_osm6_pair("2", "A", " ", active_lanes, lap, event, heat, 1, 1, 4, "2:22.07")
-        f.write(f"{p1.hex()};{p2.hex()};500\n")
-        p1, p2 = generate_osm6_pair("2", "A", " ", active_lanes, lap, event, heat, 2, 2, 4, "2:02.07")
-        f.write(f"{p1.hex()};{p2.hex()};50\n")
-        p1, p2 = generate_osm6_pair("2", "A", " ", active_lanes, lap, event, heat, 3, 3, 4, "2:22.07")
-        f.write(f"{p1.hex()};{p2.hex()};500\n")
-        p1, p2 = generate_osm6_pair("2", "A", " ", active_lanes, lap, event, heat, 4, 4, 4, "2:02.07")
-        f.write(f"{p1.hex()};{p2.hex()};500\n")
-        p1, p2 = generate_osm6_pair("2", "A", " ", active_lanes, lap, event, heat, 5, 5, 4, "2:22.07")
-        f.write(f"{p1.hex()};{p2.hex()};50\n")
-        p1, p2 = generate_osm6_pair("2", "A", " ", active_lanes, lap, event, heat, 6, 6, 4, "2:02.07")
-        f.write(f"{p1.hex()};{p2.hex()};5\n")
-        p1, p2 = generate_osm6_pair("2", "A", " ", active_lanes, lap, event, heat, 7, 7, 4, "2:22.07")
-        f.write(f"{p1.hex()};{p2.hex()};500\n")
-        p1, p2 = generate_osm6_pair("2", "A", " ", active_lanes, lap, event, heat, 8, 8, 4, "1:55.07")
+        for current_lane in range(1, lanes):
+            random_lane = random.randint(1, lanes)
+            time_end = ":01.89"
+            p1, p2 = generate_osm6_pair("2", "A", " ", active_lanes, lap, event, heat, random_lane, current_lane, lap, f"{lap}{time_end}")
+            f.write(f"{p1.hex()};{p2.hex()};500\n")
+        p1, p2 = generate_osm6_pair("2", "A", " ", active_lanes, lap, event, heat, 6, 6, lap, f"{lap}{time_end}")
         f.write(f"{p1.hex()};{p2.hex()};5000\n")
 
         # 5. Offizielles Ende
