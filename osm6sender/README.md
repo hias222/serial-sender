@@ -12,7 +12,6 @@ Dieses Projekt simuliert eine **Swiss Timing Quantum** oder **ARES21** Zeitmessk
 * **Daten-Auslagerung**: Generiert und speichert Nachrichten-Paare (Part 1 & Part 2) als Hex-Strings zeilenweise in einer externen Textdatei.
 * **Live-Klartext-Log**: Dekodiert gesendete Daten live im Terminal (Wettkampf, Bahn, Runde, Platzierung, Zeit).
 * **Protokoll-Konform**: Berechnet automatisch die korrekte Bit-Maske für genutzte Bahnen (Used Lanes Indicator laut Spezifikation).
-
 ---
 
 ## 🛠️ Voraussetzungen & Installation
