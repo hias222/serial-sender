@@ -193,16 +193,23 @@ if __name__ == "__main__":
     TARGET_PORT = "/dev/ttyUSB0"  # Anpassen an Ihren echten COM-Port
     # Schritt 1: Datei mit allen 5 Rennphasen erzeugen
     events = [1, 2, 3]
+    
+    EVENT_LAP_MAPPING = {
+        1: 2,  # Event 1 hat immer 3 Laps
+        2: 2,  # Event 2 hat immer 4 Laps
+        3: 4   # Event 3 hat immer 5 Laps
+    }
+    
     heats = [1, 2]
     
-    for current_event in events:
+    for current_event, current_lap in EVENT_LAP_MAPPING.items():
         for current_heat in heats:
             
             print(f"--- Starte Durchgang: Lap, Event {current_event}, Heat {current_heat} ---")
             print(f"Speichere in: {LOG_FILE}")
             print(f"Sende an: {TARGET_PORT}")
             
-            save_packets_to_file(LOG_FILE, lap=4, event=current_event, heat=current_heat)
+            save_packets_to_file(LOG_FILE, lap=current_lap, event=current_event, heat=current_heat)
             
             # Schritt 2: Sende-Vorgang starten (URL anpassen, z.B. 'ftdi://ftdi:232:1/1')
             send_from_file_ftdi(LOG_FILE, TARGET_PORT)
