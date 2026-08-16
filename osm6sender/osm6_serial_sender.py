@@ -182,14 +182,27 @@ def send_from_file_ftdi(filename: str, port_name: str):
         print(f"[!] Datei '{filename}' nicht gefunden.")
     finally:
         if port:
+            keep_alive_active = False
+            alive_thread.join()
+
             port.close()
-            print("\n[*] FTDI-Port geschlossen.")
+            print("\n[*] Serial-Port geschlossen.")
 
 if __name__ == "__main__":
     LOG_FILE = "osm6_simulated.txt"
     TARGET_PORT = "/dev/ttyUSB0"  # Anpassen an Ihren echten COM-Port
     # Schritt 1: Datei mit allen 5 Rennphasen erzeugen
-    save_packets_to_file(LOG_FILE)
+    events = [1, 2, 3]
+    heats = [1, 2]
     
-    # Schritt 2: Sende-Vorgang starten (URL anpassen, z.B. 'ftdi://ftdi:232:1/1')
-    send_from_file_ftdi(LOG_FILE, TARGET_PORT)
+    for current_event in events:
+        for current_heat in heats:
+            
+            print(f"--- Starte Durchgang: Lap, Event {current_event}, Heat {current_heat} ---")
+            print(f"Speichere in: {LOG_FILE}")
+            print(f"Sende an: {TARGET_PORT}")
+            
+            save_packets_to_file(LOG_FILE, lap=4, event=current_event, heat=current_heat)
+            
+            # Schritt 2: Sende-Vorgang starten (URL anpassen, z.B. 'ftdi://ftdi:232:1/1')
+            send_from_file_ftdi(LOG_FILE, TARGET_PORT)

@@ -175,13 +175,40 @@ def send_from_file_ftdi(filename: str, ftdi_url: str):
         print(f"[!] Datei '{filename}' nicht gefunden.")
     finally:
         if port:
+
+            keep_alive_active = False
+            alive_thread.join()
+            
             port.close()
+
             print("\n[*] FTDI-Port geschlossen.")
 
 if __name__ == "__main__":
     LOG_FILE = "osm6_simulated.txt"
     # Schritt 1: Datei mit allen 5 Rennphasen erzeugen
-    save_packets_to_file(LOG_FILE)
+
+    TARGET_PORT = "ftdi://ftdi:232/1" 
+
+    events = [1, 2, 3]
     
-    # Schritt 2: Sende-Vorgang starten (URL anpassen, z.B. 'ftdi://ftdi:232:1/1')
-    send_from_file_ftdi(LOG_FILE, "ftdi://ftdi:232/1")
+    EVENT_LAP_MAPPING = {
+        1: 2,  # Event 1 hat immer 3 Laps
+        2: 2,  # Event 2 hat immer 4 Laps
+        3: 4   # Event 3 hat immer 5 Laps
+    }
+    
+    
+    heats = [1, 2]
+    
+    for current_event, current_lap in EVENT_LAP_MAPPING.items():
+        for current_heat in heats:
+            
+            print(f"--- Starte Durchgang: Lap, Event {current_event}, Heat {current_heat} ---")
+            print(f"Speichere in: {LOG_FILE}")
+            print(f"Sende an: {TARGET_PORT}")
+            
+            save_packets_to_file(LOG_FILE, lap=current_lap, event=current_event, heat=current_heat)
+            
+            # Schritt 2: Sende-Vorgang starten (URL anpassen, z.B. 'ftdi://ftdi:232:1/1')
+            send_from_file_ftdi(LOG_FILE, TARGET_PORT)
+
