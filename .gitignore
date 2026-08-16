@@ -5,6 +5,7 @@ build
 .vscode
 .DS_Store
 venv
+.venv
 
 ### CMake ###
 CMakeLists.txt.user
