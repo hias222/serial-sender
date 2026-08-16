@@ -100,40 +100,7 @@ def decode_and_log(p1_bytes: bytes, p2_bytes: bytes, index: int):
     except Exception as e:
         print(f"\n[!] Fehler beim Dekodieren für das Log: {e}")
 
-def calculate_used_lanes(lanes: list) -> bytes:
-    """Berechnet die 2 Bytes für die genutzten Bahnen (Protokoll-Standard: Basis 0x20)"""
-    byte1 = 0x20
-    byte2 = 0x20
-    for lane in lanes:
-        if 1 <= lane <= 5:
-            byte1 |= (1 << (lane - 1))
-        elif 6 <= lane <= 10:
-            byte2 |= (1 << (lane - 6))
-    return bytes([byte1, byte2])
 
-def generate_osm6_pair(msg_type: str, kind_of_time: str, time_type: str, 
-                       lanes: list, lap: int, event: int, heat: int, 
-                       rank: int, active_lane: int, current_lap: int, time_str: str) -> tuple:
-    """Generiert Part 1 und Part 2 des OSM6-Protokolls als Byte-Strings."""
-    a = str(msg_type).encode('ascii')
-    b = str(kind_of_time).encode('ascii')
-    c = str(time_type).encode('ascii') if time_type and time_type != " " else SPACE
-    dd = calculate_used_lanes(lanes)
-    
-    ee = f"{lap:2d}".encode('ascii')
-    fff = f"{event:3d}".encode('ascii')
-    gg = f"{heat:2d}".encode('ascii')
-    hh = f"{rank:2d}".encode('ascii') if rank > 0 else b'  '
-
-    part1 = SOH + STX + HOME + a + b + c + dd + ee + fff + gg + SPACE + SPACE + hh + EOT
-
-    j = str(active_lane).encode('ascii')
-    kk = f"{current_lap:2d}".encode('ascii')
-    formatted_time = f"{time_str:>11} ".encode('ascii')
-
-    part2 = SOH + STX + HOME + LF + j + kk + STX + formatted_time + EOT
-
-    return part1, part2
 
 
 def send_alive_message_ftdi(port):
