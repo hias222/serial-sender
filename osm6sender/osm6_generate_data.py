@@ -65,21 +65,12 @@ def save_packets_to_file(filename: str, lap: int, event: int, heat: int):
         f.write(f"{p1.hex()};{p2.hex()};500\n")
 
         # 3. Reaktionszeit
-        p1, p2 = generate_osm6_pair("2", "R", " ", active_lanes, lap, event, heat, 1, 1, 1, ".89")
-        f.write(f"{p1.hex()};{p2.hex()};1\n")
-        p1, p2 = generate_osm6_pair("2", "R", " ", active_lanes, lap, event, heat, 2, 2, 1, ".70")
-        f.write(f"{p1.hex()};{p2.hex()};10\n")
-        p1, p2 = generate_osm6_pair("2", "R", " ", active_lanes, lap, event, heat, 3, 3, 1, ".86")
-        f.write(f"{p1.hex()};{p2.hex()};10\n")
-        p1, p2 = generate_osm6_pair("2", "R", " ", active_lanes, lap, event, heat, 5, 4, 1, ".70")
-        f.write(f"{p1.hex()};{p2.hex()};1\n")
-        p1, p2 = generate_osm6_pair("2", "R", " ", active_lanes, lap, event, heat, 4, 5, 1, ".86")
-        f.write(f"{p1.hex()};{p2.hex()};10\n")
-        p1, p2 = generate_osm6_pair("2", "R", " ", active_lanes, lap, event, heat, 6, 6, 1, ".86")
-        f.write(f"{p1.hex()};{p2.hex()};1\n")
-        p1, p2 = generate_osm6_pair("2", "R", " ", active_lanes, lap, event, heat, 7, 7, 1, ".86")
-        f.write(f"{p1.hex()};{p2.hex()};1\n")
-        p1, p2 = generate_osm6_pair("2", "R", " ", active_lanes, lap, event, heat, 8, 8, 1, ".86")
+        for current_lane in range(1, lanes):
+            random_lane = random.randint(1, lanes)
+            time_end = ":01.89"
+            p1, p2 = generate_osm6_pair("2", "R", " ", active_lanes, lap, event, heat, random_lane, current_lane, 1, ".89")
+            f.write(f"{p1.hex()};{p2.hex()};1\n")
+        p1, p2 = generate_osm6_pair("2", "R", " ", active_lanes, lap, event, heat, lanes, lanes, 1, ".86")
         f.write(f"{p1.hex()};{p2.hex()};10000\n")
 
 
@@ -91,7 +82,7 @@ def save_packets_to_file(filename: str, lap: int, event: int, heat: int):
                     time_end = ":21.89"
                     p1, p2 = generate_osm6_pair("2", "I", " ", active_lanes, lap, event, heat, random_lane, current_lane, current_lap, f"{current_lap}{time_end}")
                     f.write(f"{p1.hex()};{p2.hex()};500\n")
-                p1, p2 = generate_osm6_pair("2", "I", " ", active_lanes, lap, event, heat, 3, lanes, current_lap, f"{current_lap}{time_end}")
+                p1, p2 = generate_osm6_pair("2", "I", " ", active_lanes, lap, event, heat, lanes, lanes, current_lap, f"{current_lap}{time_end}")
                 f.write(f"{p1.hex()};{p2.hex()};10000\n")
         
         # 4. Endzeit
@@ -100,7 +91,7 @@ def save_packets_to_file(filename: str, lap: int, event: int, heat: int):
             time_end = ":01.89"
             p1, p2 = generate_osm6_pair("2", "A", " ", active_lanes, lap, event, heat, random_lane, current_lane, lap, f"{lap}{time_end}")
             f.write(f"{p1.hex()};{p2.hex()};500\n")
-        p1, p2 = generate_osm6_pair("2", "A", " ", active_lanes, lap, event, heat, 6, 6, lap, f"{lap}{time_end}")
+        p1, p2 = generate_osm6_pair("2", "A", " ", active_lanes, lap, event, heat, lanes, lanes, lap, f"{lap}{time_end}")
         f.write(f"{p1.hex()};{p2.hex()};5000\n")
 
         # 5. Offizielles Ende

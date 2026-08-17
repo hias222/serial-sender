@@ -195,9 +195,9 @@ if __name__ == "__main__":
     events = [1, 2, 3]
     
     EVENT_LAP_MAPPING = {
-        1: 1,  # Event 1 hat immer 3 Laps
-        2: 1,  # Event 2 hat immer 4 Laps
-        3: 2   # Event 3 hat immer 5 Laps
+        1: 2,  # Event 1 hat immer 3 Laps
+        2: 4,  # Event 2 hat immer 4 Laps
+        3: 1   # Event 3 hat immer 5 Laps
     }
     
     heats = [1, 2]
