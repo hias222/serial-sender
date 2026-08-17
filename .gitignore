@@ -6,6 +6,7 @@ build
 .DS_Store
 venv
 .venv
+__pycache__
 
 ### CMake ###
 CMakeLists.txt.user
